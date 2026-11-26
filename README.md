@@ -2,7 +2,7 @@
 
 A personal vinyl collection site with a warm 1970s hi-fi aesthetic. The first milestone is a static React + TypeScript + Vite app with a responsive collection grid, search, genre filtering, sorting, favorites, and shareable album-detail URLs.
 
-> **Sample data:** Every record currently shown is fictional sample data. The UI, source data, detail view, and footer label it accordingly. No Discogs account is needed for this milestone.
+The catalog currently contains 23 records from the owner's collection. Album-level metadata is normalized from MusicBrainz, and artwork is served by the Cover Art Archive. Exact pressing details remain intentionally unset until a catalog number, barcode, or label photo identifies the physical edition.
 
 ## Run locally
 
@@ -54,7 +54,7 @@ The normalized album schema already includes optional Discogs release, master, c
 ```text
 src/
   components/       Album card, artwork, and detail dialog
-  data/             Explicitly labeled sample catalog
+  data/             Manually curated collection catalog
   App.tsx            Catalog experience and URL state
   types.ts           Discogs-ready normalized schema
   styles.css         Responsive hi-fi visual system

@@ -9,6 +9,10 @@ interface AlbumDetailProps {
 
 export function AlbumDetail({ album, onClose }: AlbumDetailProps) {
   const closeRef = useRef<HTMLButtonElement>(null)
+  const releaseDisplay = album.releaseDate
+    ? new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })
+        .format(new Date(`${album.releaseDate}T00:00:00Z`))
+    : album.year.toString()
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow
@@ -30,15 +34,15 @@ export function AlbumDetail({ album, onClose }: AlbumDetailProps) {
         </button>
         <div className="detail-art-column">
           <AlbumArtwork album={album} large />
-          <div className="sample-stamp">Sample catalog entry</div>
+          <div className="sample-stamp">{album.isSample ? 'Sample catalog entry' : 'From the collection'}</div>
         </div>
         <div className="detail-copy">
-          <p className="eyebrow">{album.label} · {album.catalogNumber}</p>
+          <p className="eyebrow">{album.label}{album.catalogNumber ? ` · ${album.catalogNumber}` : ''}</p>
           <h2 id="album-detail-title">{album.title}</h2>
           <p className="detail-artist">{album.artist}</p>
-          <p className="detail-notes">{album.notes ?? 'A sample record ready for your own listening notes.'}</p>
+          <p className="detail-notes">{album.notes ?? 'Listening notes can be added here.'}</p>
           <dl className="detail-facts">
-            <div><dt>Released</dt><dd>{album.year}{album.country ? ` · ${album.country}` : ''}</dd></div>
+            <div><dt>Released</dt><dd>{releaseDisplay}{album.country ? ` · ${album.country}` : ''}</dd></div>
             <div><dt>Format</dt><dd>{album.format}{album.pressing ? ` · ${album.pressing}` : ''}</dd></div>
             <div><dt>Style</dt><dd>{album.styles.join(', ')}</dd></div>
             <div><dt>Media</dt><dd>{album.recordCondition}</dd></div>

@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AlbumCard } from './components/AlbumCard'
 import { AlbumDetail } from './components/AlbumDetail'
-import { sampleCatalog } from './data/sampleCatalog'
+import { catalog } from './data/catalog'
 import type { Album } from './types'
 
 type SortOption = 'artist' | 'title' | 'year-new' | 'year-old' | 'recent'
 
-const albums = sampleCatalog.records
+const albums = catalog.records
 const genres = ['All genres', ...Array.from(new Set(albums.flatMap((album) => album.genres))).sort()]
 
 function albumFromHash(): Album | null {
@@ -78,7 +78,7 @@ export default function App() {
       <main id="top">
         <section className="hero" aria-labelledby="hero-title">
           <div className="hero-copy">
-            <div className="sample-pill">Preview · sample data</div>
+            <div className="sample-pill">Personal collection · {albums.length} records</div>
             <p className="eyebrow">A personal vinyl archive</p>
             <h1 id="hero-title">Records worth<br /><em>remembering.</em></h1>
             <p className="hero-intro">A quiet place for the records, stories, and small details that make a collection personal.</p>
@@ -99,7 +99,7 @@ export default function App() {
               <p className="eyebrow">On the shelves</p>
               <h2 id="collection-title">The collection</h2>
             </div>
-            <p className="collection-count"><strong>{filteredAlbums.length}</strong> of {albums.length} sample records</p>
+            <p className="collection-count"><strong>{filteredAlbums.length}</strong> of {albums.length} records</p>
           </div>
 
           <div className="catalog-tools" aria-label="Catalog filters">
@@ -150,8 +150,8 @@ export default function App() {
             <h2>Every sleeve has<br />a story to tell.</h2>
           </div>
           <div className="about-copy">
-            <p>This first milestone uses a fictional sample catalog and generated placeholder sleeves. It is ready for a future server-side Discogs sync—without ever placing a personal access token in the browser.</p>
-            <p>For now, explore the filters, open a record, and imagine your own collection here.</p>
+            <p>This collection is cataloged from verified album-level sources, with cover art supplied by the Cover Art Archive. Each entry preserves space for the details that make a physical copy unique.</p>
+            <p>Pressing, country, catalog number, and condition can be refined as each sleeve and label is inspected.</p>
           </div>
         </section>
       </main>
@@ -159,7 +159,7 @@ export default function App() {
       <footer>
         <div className="brand footer-brand"><span className="brand-mark" aria-hidden="true"><i /></span><span>The Listening Room</span></div>
         <p>Built for slow listening.</p>
-        <p className="sample-footer">All records shown are sample data.</p>
+        <p className="sample-footer">Edition details are still being cataloged.</p>
       </footer>
 
       {selectedAlbum && <AlbumDetail album={selectedAlbum} onClose={closeAlbum} />}

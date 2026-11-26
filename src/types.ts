@@ -3,14 +3,14 @@
  * Discogs without coupling the UI to a raw API response.
  */
 export type Format = 'LP' | '2×LP' | '7″' | '12″' | 'Box Set'
-export type RecordCondition = 'Mint' | 'Near Mint' | 'Very Good Plus' | 'Very Good' | 'Good'
+export type RecordCondition = 'Mint' | 'Near Mint' | 'Very Good Plus' | 'Very Good' | 'Good' | 'Not graded'
 export type CoverCondition = RecordCondition
 
 export interface AlbumImage {
   uri: string
   width?: number
   height?: number
-  source: 'discogs' | 'local' | 'generated'
+  source: 'discogs' | 'musicbrainz' | 'local' | 'generated'
 }
 
 export interface Album {
@@ -19,6 +19,7 @@ export interface Album {
   artist: string
   title: string
   year: number
+  releaseDate?: string
   genres: string[]
   styles: string[]
   label: string
@@ -41,6 +42,10 @@ export interface Album {
     collectionInstanceId?: number
     lastSyncedAt: string
   }
+  musicbrainz?: {
+    releaseGroupId: string
+    lastVerifiedAt: string
+  }
   /** Keeps demo records unmistakable in the UI and data layer. */
   isSample: boolean
   /** Palette drives the placeholder sleeve until real art is synced. */
@@ -53,7 +58,7 @@ export interface Album {
 export interface CatalogSnapshot {
   schemaVersion: 1
   generatedAt: string
-  source: 'sample' | 'discogs-export'
+  source: 'sample' | 'manual' | 'discogs-export'
   ownerDisplayName: string
   records: Album[]
 }
