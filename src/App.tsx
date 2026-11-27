@@ -2,16 +2,26 @@ import { useEffect, useMemo, useState } from 'react'
 import { AlbumCard } from './components/AlbumCard'
 import { AlbumDetail } from './components/AlbumDetail'
 import { catalog } from './data/catalog'
-import type { Album } from './types'
+import type { Album, PersonalRecordDetails } from './types'
 
 type SortOption = 'artist' | 'title' | 'year-new' | 'year-old' | 'recent'
 
 const albums = catalog.records
 const genres = ['All genres', ...Array.from(new Set(albums.flatMap((album) => album.genres))).sort()]
+const personalDetailsStorageKey = 'the-listening-room-personal-details-v1'
 
-function albumFromHash(): Album | null {
+function albumIdFromHash(): string | null {
   const match = window.location.hash.match(/^#\/album\/(.+)$/)
-  return match ? albums.find((album) => album.id === decodeURIComponent(match[1])) ?? null : null
+  return match ? decodeURIComponent(match[1]) : null
+}
+
+function loadPersonalDetails(): Record<string, PersonalRecordDetails> {
+  try {
+    const stored = window.localStorage.getItem(personalDetailsStorageKey)
+    return stored ? JSON.parse(stored) as Record<string, PersonalRecordDetails> : {}
+  } catch {
+    return {}
+  }
 }
 
 export default function App() {
@@ -19,17 +29,33 @@ export default function App() {
   const [genre, setGenre] = useState('All genres')
   const [sort, setSort] = useState<SortOption>('artist')
   const [favoritesOnly, setFavoritesOnly] = useState(false)
-  const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(() => albumFromHash())
+  const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(() => albumIdFromHash())
+  const [personalDetails, setPersonalDetails] = useState<Record<string, PersonalRecordDetails>>(loadPersonalDetails)
 
   useEffect(() => {
-    const syncHash = () => setSelectedAlbum(albumFromHash())
+    const syncHash = () => setSelectedAlbumId(albumIdFromHash())
     window.addEventListener('hashchange', syncHash)
     return () => window.removeEventListener('hashchange', syncHash)
   }, [])
 
+  const personalizedAlbums = useMemo(() => albums.map((album) => {
+    const details = personalDetails[album.id]
+    if (!details) return album
+    return {
+      ...album,
+      recordCondition: details.recordCondition,
+      acquiredOn: details.acquiredOn || undefined,
+      acquiredFrom: details.acquiredFrom || undefined,
+      favorite: details.favorite,
+      notes: details.notes || undefined,
+    }
+  }), [personalDetails])
+
+  const selectedAlbum = personalizedAlbums.find((album) => album.id === selectedAlbumId) ?? null
+
   const filteredAlbums = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase()
-    return albums
+    return personalizedAlbums
       .filter((album) => {
         const searchable = [album.title, album.artist, album.label, album.year, ...album.genres, ...album.styles, ...album.tags]
           .join(' ')
@@ -45,7 +71,7 @@ export default function App() {
         if (sort === 'recent') return (b.acquiredOn ?? '').localeCompare(a.acquiredOn ?? '')
         return a.artist.localeCompare(b.artist)
       })
-  }, [query, genre, sort, favoritesOnly])
+  }, [query, genre, sort, favoritesOnly, personalizedAlbums])
 
   const openAlbum = (album: Album) => {
     window.location.hash = `/album/${encodeURIComponent(album.id)}`
@@ -53,7 +79,15 @@ export default function App() {
 
   const closeAlbum = () => {
     if (window.location.hash.startsWith('#/album/')) history.pushState(null, '', `${window.location.pathname}${window.location.search}`)
-    setSelectedAlbum(null)
+    setSelectedAlbumId(null)
+  }
+
+  const savePersonalDetails = (albumId: string, details: PersonalRecordDetails) => {
+    setPersonalDetails((current) => {
+      const next = { ...current, [albumId]: details }
+      window.localStorage.setItem(personalDetailsStorageKey, JSON.stringify(next))
+      return next
+    })
   }
 
   const resetFilters = () => {
@@ -150,8 +184,8 @@ export default function App() {
             <h2>Every sleeve has<br />a story to tell.</h2>
           </div>
           <div className="about-copy">
-            <p>This collection is cataloged from verified album-level sources, with cover art supplied by the Cover Art Archive. Each entry preserves space for the details that make a physical copy unique.</p>
-            <p>Pressing, country, catalog number, and condition can be refined as each sleeve and label is inspected.</p>
+            <p>This collection keeps the essentials up front: cover, artist, title, release, genre, label, and format.</p>
+            <p>Open any album to add condition, acquisition details, favorite status, and personal notes. Those details are saved privately in this browser.</p>
           </div>
         </section>
       </main>
@@ -159,10 +193,17 @@ export default function App() {
       <footer>
         <div className="brand footer-brand"><span className="brand-mark" aria-hidden="true"><i /></span><span>The Listening Room</span></div>
         <p>Built for slow listening.</p>
-        <p className="sample-footer">Edition details are still being cataloged.</p>
+        <p className="sample-footer">Personal details stay on this device.</p>
       </footer>
 
-      {selectedAlbum && <AlbumDetail album={selectedAlbum} onClose={closeAlbum} />}
+      {selectedAlbum && (
+        <AlbumDetail
+          album={selectedAlbum}
+          details={personalDetails[selectedAlbum.id]}
+          onClose={closeAlbum}
+          onSave={savePersonalDetails}
+        />
+      )}
     </>
   )
 }

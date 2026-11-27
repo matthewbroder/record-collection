@@ -6,6 +6,14 @@ export type Format = 'LP' | '2×LP' | '7″' | '12″' | 'Box Set'
 export type RecordCondition = 'Mint' | 'Near Mint' | 'Very Good Plus' | 'Very Good' | 'Good' | 'Not graded'
 export type CoverCondition = RecordCondition
 
+export interface PersonalRecordDetails {
+  recordCondition: RecordCondition
+  acquiredOn: string
+  acquiredFrom: string
+  favorite: boolean
+  notes: string
+}
+
 export interface AlbumImage {
   uri: string
   width?: number

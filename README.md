@@ -1,6 +1,6 @@
 # The Listening Room
 
-A personal vinyl collection site with a warm 1970s hi-fi aesthetic. The first milestone is a static React + TypeScript + Vite app with a responsive collection grid, search, genre filtering, sorting, favorites, and shareable album-detail URLs.
+A personal vinyl collection site with a warm 1970s hi-fi aesthetic. The app includes a responsive collection grid, search, genre filtering, sorting, favorites, editable personal details, and shareable album-detail URLs.
 
 The catalog currently contains 23 records from the owner's collection. Album-level metadata is normalized from MusicBrainz, and artwork is served by the Cover Art Archive. Exact pressing details remain intentionally unset until a catalog number, barcode, or label photo identifies the physical edition.
 
@@ -34,7 +34,11 @@ The repository includes `.github/workflows/deploy.yml`, and Vite uses relative a
 4. Push to `main`, or run **Deploy to GitHub Pages** from the Actions tab.
 5. When the workflow completes, the Pages URL appears in the deployment summary.
 
-Album details use hash URLs (for example `#/album/sample-afterglow`), so direct links work on GitHub Pages without server-side rewrite rules.
+Album details use hash URLs (for example `#/album/coldplay-parachutes`), so direct links work on GitHub Pages without server-side rewrite rules.
+
+## Personal details
+
+Condition, acquisition date and source, favorite status, and notes can be edited from each album detail view. These fields are saved to browser `localStorage`, so they remain private to that browser and device. They are not committed to the public repository or synchronized between devices.
 
 ## Catalog shape and future Discogs sync
 
